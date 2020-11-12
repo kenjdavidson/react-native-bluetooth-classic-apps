@@ -7,6 +7,8 @@ Originally the development and example apps were stored inside the library itsel
 1. There were issues writing tests (dependencies required for testing broke the Example app) 
 2. With more apps being required (multiple React Native versions, functionality showcase, etc) the library would be polluted
 
+All these apps will be configured to use the locally installed `../../react-native-bluetooth-classic/` project.
+
 ## Example Apps
 
 ### BluetoothClassicExample
