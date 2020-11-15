@@ -101,7 +101,7 @@ DEPENDENCIES:
   - React-jsi (from `../node_modules/react-native/ReactCommon/jsi`)
   - React-jsiexecutor (from `../node_modules/react-native/ReactCommon/jsiexecutor`)
   - React-jsinspector (from `../node_modules/react-native/ReactCommon/jsinspector`)
-  - react-native-bluetooth-classic (from `../../`)
+  - react-native-bluetooth-classic (from `../../../react-native-bluetooth-classic`)
   - React-RCTActionSheet (from `../node_modules/react-native/Libraries/ActionSheetIOS`)
   - React-RCTAnimation (from `../node_modules/react-native/Libraries/NativeAnimation`)
   - React-RCTBlob (from `../node_modules/react-native/Libraries/Blob`)
@@ -144,7 +144,7 @@ EXTERNAL SOURCES:
   React-jsinspector:
     :path: "../node_modules/react-native/ReactCommon/jsinspector"
   react-native-bluetooth-classic:
-    :path: "../../"
+    :path: "../../../react-native-bluetooth-classic"
   React-RCTActionSheet:
     :path: "../node_modules/react-native/Libraries/ActionSheetIOS"
   React-RCTAnimation:
@@ -200,6 +200,6 @@ SPEC CHECKSUMS:
   toolbar-android: 404f4450b203597e7b417f714ff417bed562a1be
   yoga: 616fde658be980aa60a2158835170f3f9c2d04b4
 
-PODFILE CHECKSUM: 434d6063596aabf98c41532ff625b57e8477862b
+PODFILE CHECKSUM: 137af46f0fb52775ad29015b37ce62aa411f706d
 
 COCOAPODS: 1.10.0
