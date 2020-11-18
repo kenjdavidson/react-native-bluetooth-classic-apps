@@ -98,6 +98,9 @@ export default class ConnectionScreen extends React.Component {
         type: 'error'
       });
     }
+
+    // Clear the reads, so that they don't get duplicated
+    this.uninitializeRead();
   }
 
   initializeRead() {
