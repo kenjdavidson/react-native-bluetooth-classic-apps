@@ -24,7 +24,7 @@ export default class ConnectionScreen extends React.Component {
       polling: false,
       connection: false,
       connectionOptions: {
-        delimiter: '\n'
+        delimiter: '10'
       }
     }
   }
