@@ -1,11 +1,13 @@
 {
-	"folders": [
-		{
-			"path": "."
-		},
-		{
-			"path": "../../react-native-bluetooth-classic"
-		}
-	],
-	"settings": {}
+  "folders": [
+    {
+      "path": "."
+    },
+    {
+      "path": "../../react-native-bluetooth-classic"
+    }
+  ],
+  "settings": {
+    "editor.formatOnSave": true
+  }
 }

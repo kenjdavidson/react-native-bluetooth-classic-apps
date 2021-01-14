@@ -25,7 +25,10 @@ const path = require('path');
 // Update to metro allowing react-native devDependency without breaking Metro/Hast
 // https://medium.com/@charpeni/setting-up-an-example-app-for-your-react-native-library-d940c5cf31e4
 const blacklist = require('metro-config/src/defaults/blacklist');
-const bluetoothLib = path.resolve(__dirname, '../../react-native-bluetooth-classic/');
+const bluetoothLib = path.resolve(
+  __dirname,
+  '../../react-native-bluetooth-classic',
+);
 
 module.exports = {
   transformer: {
@@ -44,7 +47,7 @@ module.exports = {
      * app's node_modules directory.
      */
     extraNodeModules: new Proxy(
-      /* The first argument to the Proxy constructor is passed as 
+      /* The first argument to the Proxy constructor is passed as
        * "target" to the "get" method below.
        * Put the names of the libraries included in your reusable
        * module as they would be imported when the module is actually used.
