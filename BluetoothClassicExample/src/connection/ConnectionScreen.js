@@ -37,7 +37,7 @@ export default class ConnectionScreen extends React.Component {
       polling: false,
       connection: false,
       connectionOptions: {
-        DELIMITER: '\n',
+        DELIMITER: '9',
       },
     };
   }
@@ -78,9 +78,8 @@ export default class ConnectionScreen extends React.Component {
           type: 'error',
         });
 
-        connection = await this.props.device.connect(
-          this.state.connectionOptions
-        );
+        console.log(this.state.connectionOptions);
+        connection = await this.props.device.connect();
 
         this.addData({
           data: 'Connection successful',
