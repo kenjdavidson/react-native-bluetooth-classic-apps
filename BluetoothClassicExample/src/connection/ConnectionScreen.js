@@ -215,13 +215,11 @@ export default class ConnectionScreen extends React.Component {
       });
 
       let data = Buffer.alloc(10, 0xEF);
-      await RNBluetoothClassic.writeToDevice(
-        this.props.device.address,
-        data);
+      await this.props.device.write(data);
 
       this.addData({
         timestamp: new Date(),
-        data: data.toString(),
+        data: `Byte array: ${data.toString()}`,
         type: 'sent',
       });
 
