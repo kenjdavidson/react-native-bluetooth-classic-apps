@@ -19,6 +19,7 @@ import {
   TextInput,
   TouchableOpacity,
 } from 'react-native';
+import { Buffer } from 'buffer';
 
 /**
  * Manages a selected device connection.  The selected Device should
@@ -210,6 +211,17 @@ export default class ConnectionScreen extends React.Component {
       this.addData({
         timestamp: new Date(),
         data: this.state.text,
+        type: 'sent',
+      });
+
+      let data = Buffer.alloc(10, 0xEF);
+      await RNBluetoothClassic.writeToDevice(
+        this.props.device.address,
+        data);
+
+      this.addData({
+        timestamp: new Date(),
+        data: data.toString(),
         type: 'sent',
       });
 
