@@ -27,7 +27,7 @@ const path = require('path');
 const blacklist = require('metro-config/src/defaults/blacklist');
 const bluetoothLib = path.resolve(
   __dirname,
-  '../../react-native-bluetooth-classic',
+  '../BluetoothClassicExample/node_modules/react-native-bluetooth-classic'
 );
 
 module.exports = {
