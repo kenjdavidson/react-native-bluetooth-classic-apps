@@ -1,12 +1,11 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import RNBluetoothClassic from 'react-native-bluetooth-classic';
-import {
-  Text,
-  Icon,
-  VStack,
-  IconButton,
-  HStack,
-} from 'native-base';
+import React, {useCallback, useEffect, useMemo, useState} from 'react';
+import RNBluetoothClassic, {
+  BluetoothDevice,
+  BluetoothDeviceReadEvent,
+  BluetoothEventSubscription,
+  BluetoothEventType,
+} from 'react-native-bluetooth-classic';
+import {Text, Icon, VStack, IconButton, HStack} from 'native-base';
 import {
   FlatList,
   View,
@@ -18,58 +17,63 @@ import Screen from '../common-screen/Screen';
 import * as Ionicons from 'react-native-vector-icons/Ionicons';
 
 export interface ConnectionScreenProps {
-  device: BluetoothDevice,
-  onBackPress: () => void,
+  device: BluetoothDevice;
+  onBackPress: () => void;
 }
 
 type DeviceData = {
-  data: string,
-  timestamp: Date,
-  type: string
-}
+  data: string;
+  timestamp: Date;
+  type: string;
+};
 
 export const ConnectionScreen = ({
   device,
-  onBackPress
+  onBackPress,
 }: ConnectionScreenProps) => {
   const [text, setText] = useState<string>('');
   const [data, setData] = useState<DeviceData[]>([]);
-  const [polling, setPolling] = useState<boolean>(false);
+  const [polling] = useState<boolean>(false);
   const [connection, setConnection] = useState<boolean>();
-  const [delimiter, setDelimiter] = useState('\n');
-  const [disconnectSubscription, setDisconnectSubscription] = useState();
-  const [readSubscription, setReadSubscription] = useState();
-  const [readInterval, setReadInterval] = useState<Timeout | undefined>();
+  const [delimiter] = useState('\n');
+  const [_, setDisconnectSubscription] = useState<BluetoothEventSubscription>();
+  const [readSubscription, setReadSubscription] =
+    useState<BluetoothEventSubscription>();
+  const [readInterval, setReadInterval] = useState<
+    NodeJS.Timeout | undefined
+  >();
 
   const addData = (newData: DeviceData) => setData([newData, ...data]);
 
-  const initializeRead = async () => {  
-    setDisconnectSubscription(RNBluetoothClassic.onDeviceDisconnected(() => disconnect(true)));
+  const initializeRead = async () => {
+    setDisconnectSubscription(
+      RNBluetoothClassic.onDeviceDisconnected(() => disconnect(true)),
+    );
 
     if (polling) {
-      setReadInterval(setInterval(() => performRead(), 5000));
+      setReadInterval(global.setInterval(() => performRead(), 5000));
     } else {
       setReadSubscription(device.onDataReceived(data => onReceivedData(data)));
     }
-  }
+  };
 
   const uninitializeRead = async () => {
     readInterval && clearInterval(readInterval);
     readSubscription && readSubscription.remove();
     setReadSubscription(undefined);
-  }
+  };
 
-  const connect = async() => {
+  const connect = async () => {
     try {
-      let connection = await device.isConnected();
-      if (!connection) {
+      let connected = await device.isConnected();
+      if (!connected) {
         addData({
           data: `Attempting connection to ${device.address}`,
           timestamp: new Date(),
           type: 'error',
         });
 
-        connection = await device.connect();
+        connected = await device.connect();
 
         addData({
           data: 'Connection successful',
@@ -86,7 +90,7 @@ export const ConnectionScreen = ({
 
       await initializeRead();
 
-      setConnection(connection);      
+      setConnection(connected);
     } catch (error) {
       console.log(error);
       addData({
@@ -95,9 +99,9 @@ export const ConnectionScreen = ({
         type: 'error',
       });
     }
-  }
+  };
 
-  const disconnect = async (disconnected: boolean) {
+  const disconnect = async (disconnected: boolean) => {
     try {
       if (!disconnected) {
         disconnected = await device.disconnect();
@@ -121,15 +125,15 @@ export const ConnectionScreen = ({
 
     // Clear the reads, so that they don't get duplicated
     await uninitializeRead();
-  }
+  };
 
-  const onReceivedData = async (data: string) => {
+  const onReceivedData = async (event: BluetoothDeviceReadEvent) => {
     addData({
-      data: data,
+      data: event.data,
       timestamp: new Date(),
       type: 'receive',
     });
-  }
+  };
 
   const sendData = async () => {
     try {
@@ -156,7 +160,7 @@ export const ConnectionScreen = ({
     } catch (error) {
       console.log(error);
     }
-  }
+  };
 
   const performRead = async () => {
     try {
@@ -167,84 +171,103 @@ export const ConnectionScreen = ({
       if (available > 0) {
         for (let i = 0; i < available; i++) {
           console.log(`reading ${i}th time`);
-          let data = await device.read();
+          const readData = await device.read();
 
-          console.log(`Read data ${data}`);
-          console.log(data);
-          onReceivedData(data);
+          console.log(`Read data ${readData}`);
+          console.log(readData);
+          onReceivedData({
+            data: readData.toString(),
+            device: device,
+            eventType: BluetoothEventType.DEVICE_READ,
+            timestamp: new Date().toDateString(),
+          });
         }
       }
     } catch (err) {
       console.log(err);
     }
-  }
+  };
 
   useEffect(() => {
     async function startConnection() {
       await device.connect();
     }
+
+    startConnection();
+
     return () => {
       async function endConnection() {
         await device.disconnect();
         await uninitializeRead();
       }
-    
-      await endConnection();
+
+      endConnection();
     };
   });
 
   const toggleConnection = useCallback(async () => {
-    return connection ? disconnect : connect
+    return connection ? disconnect : connect;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [connection]);
   const connectionIcon = useMemo(() => {
-    return connection
-    ? 'radio-button-on'
-    : 'radio-button-off';
+    return connection ? 'radio-button-on' : 'radio-button-off';
   }, [connection]);
 
   return (
     <Screen
       renderBody={
         <VStack>
-            <Text fontSize="md">{device.name}</Text>
-            <Text fontSize="xs">{device.address}</Text>          
+          <Text fontSize="md">{device.name}</Text>
+          <Text fontSize="xs">{device.address}</Text>
         </VStack>
       }
       renderLeft={
-        <IconButton variant="unstyled" onPress={onBackPress} icon={<Icon as={Ionicons} name="arrow-back" />}/>
+        <IconButton
+          variant="unstyled"
+          onPress={onBackPress}
+          icon={<Icon as={Ionicons} name="arrow-back" />}
+        />
       }
       renderRight={
-        <IconButton variant="unstyled" onPress={toggleConnection} icon={<Icon as={Ionicons} name={connectionIcon} />}/>
+        <IconButton
+          variant="unstyled"
+          onPress={toggleConnection}
+          icon={<Icon as={Ionicons} name={connectionIcon} />}
+        />
       }>
       <HStack>
-      <FlatList
-            style={styles.connectionScreenOutput}
-            contentContainerStyle={{justifyContent: 'flex-end'}}
-            inverted
-            ref="scannedDataList"
-            data={data}
-            keyExtractor={item => item.timestamp.toISOString()}
-            renderItem={({item}) => (
-              <HStack
-                id={item.timestamp.toISOString()}>
-                <Text>{item.timestamp.toLocaleDateString()}</Text>
-                <Text>{item.type === 'sent' ? ' < ' : ' > '}</Text>
-                <Text flexShrink={1}>{item.data.trim()}</Text>
-              </HStack>
-            )}
-          />
-          <InputArea
-            text={text}
-            onChangeText={text =>setText(text)}
-            onSend={() => sendData()}
-            disabled={!connection}
-          />
+        <FlatList
+          style={styles.connectionScreenOutput}
+          contentContainerStyle={{justifyContent: 'flex-end'}}
+          inverted
+          ref="scannedDataList"
+          data={data}
+          keyExtractor={item => item.timestamp.toISOString()}
+          renderItem={({item}) => (
+            <HStack id={item.timestamp.toISOString()}>
+              <Text>{item.timestamp.toLocaleDateString()}</Text>
+              <Text>{item.type === 'sent' ? ' < ' : ' > '}</Text>
+              <Text flexShrink={1}>{item.data.trim()}</Text>
+            </HStack>
+          )}
+        />
+        <InputArea
+          text={text}
+          onChangeText={text => setText(text)}
+          onSend={() => sendData()}
+          disabled={!connection}
+        />
       </HStack>
     </Screen>
   );
-}
+};
 
-const InputArea = ({text, onChangeText, onSend, disabled}: {
+const InputArea = ({
+  text,
+  onChangeText,
+  onSend,
+  disabled,
+}: {
   text: string;
   onChangeText: (value: string) => void;
   onSend: () => void;

@@ -7,11 +7,13 @@ import React, {
 } from 'react';
 import {Platform} from 'react-native';
 import {Button, Text, Icon, useToast, IconButton, VStack} from 'native-base';
-import RNBluetoothClassic from 'react-native-bluetooth-classic';
+import RNBluetoothClassic, {
+  BluetoothDevice,
+} from 'react-native-bluetooth-classic';
 import {PermissionsAndroid} from 'react-native';
 import Screen from '../common-screen/Screen';
 import * as Ionicons from 'react-native-vector-icons/Ionicons';
-import { DeviceList } from './DeviceList';
+import {DeviceList} from './DeviceList';
 
 /**
  * See https://reactnative.dev/docs/permissionsandroid for more information
@@ -50,7 +52,7 @@ export interface DeviceListScreenProps {
  * @author kendavidson
  */
 export const DeviceListScreen = ({onDeviceSelected}: DeviceListScreenProps) => {
-  const [bluetoothEnabled, setBluetoothEnabled] = useState(false);
+  const [bluetoothEnabled] = useState(true);
   const [devices, setDevices] = useState<BluetoothDevice[]>([]);
   const [accepting, setAccepting] = useState<boolean>(false);
   const [discovering, setDiscovering] = useState<boolean>(false);
@@ -154,6 +156,7 @@ export const DeviceListScreen = ({onDeviceSelected}: DeviceListScreenProps) => {
     setAccepting(true);
 
     try {
+      // @ts-expect-error need to fix the bluetooth library types
       let device = await RNBluetoothClassic.accept({delimiter: delimiter});
       if (device) {
         onDeviceSelected(device);
