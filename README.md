@@ -1,4 +1,4 @@
-# react-native-bluetooth-classic-apps
+# React Native Bluetooth Classic Apps
 
 Development applications used for programing/testing react-native-bluetooth-classic
 
@@ -16,10 +16,19 @@ Feel free to add your own sample application, either:
 
 ## Example Apps
 
-### BluetoothClassicExample
+### BluetoothClassicExample_0_60
 
 The primary application used during development.
 
 - Supports the lowest versions of React Native (0.60.0), Android (26) and IOS (9)
 - Provides almost all functionality from the library
 - Configured to use the locally installed `../../react-native-bluetooth-classic/` project.
+
+> The `react-native-bluetooth-classic@0.60` stopped working with `react-native@0.73`
+
+### BluetoothClassicExample_0_73
+
+Application used for development of the `react-native-bluetooth-classic@0.73` library.
+
+- Metro now supports local/symlinked libraries
+- 0.73 completely changed how Native Modules are developed
